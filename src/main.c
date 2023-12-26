@@ -10,9 +10,8 @@
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   1000
 
-// #define SPI0_NODE DT_NODELABEL(spi1)       //for Use DK board
-
-#define SPI0_NODE DT_NODELABEL(spi0)       //for Use PCB
+#define SPI0_NODE DT_NODELABEL(spi1)       //for Use DK board
+// #define SPI0_NODE DT_NODELABEL(spi0)       //for Use PCB
 static const struct device * spi0_dev = DEVICE_DT_GET(SPI0_NODE);
 
 const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));

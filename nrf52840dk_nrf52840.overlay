@@ -44,9 +44,9 @@
     status = "disabled";
 };
 
-// &spi1 {
-//     status = "disabled";
-// };
+&spi1 {
+    status = "okay";        //for use DK okay this
+};
 
 &spi0 {
     status = "okay";
@@ -74,6 +74,6 @@
     status = "okay";
 };
 
-&spi1 {
-    status = "disabled";
-};
+// &spi1 {
+//     status = "disabled";
+// };
