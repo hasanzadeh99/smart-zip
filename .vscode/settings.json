@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "spi.h": "c",
+        "printk.h": "c",
+        "bm_lite.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}
