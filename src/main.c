@@ -4,8 +4,13 @@
 #include <zephyr/sys/printk.h>
 // #include "bm_lite.h"
 
-#define CS_N 17
-#define RST_PIN 20
+//#define CS_N 17       //for Use PCB
+//#define RST_PIN 20    //for Use PCB
+//#define IRQ_PIN 22    //for Use PCB
+
+
+#define CS_N 04       //for Use DK board
+#define IRQ_PIN 28	  //for Use DK board
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   1000
