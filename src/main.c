@@ -10,6 +10,7 @@
 
 
 #define CS_N 04       //for Use DK board
+#define RST_PIN 03    //for Use DK board
 #define IRQ_PIN 28	  //for Use DK board
 
 /* 1000 msec = 1 sec */
@@ -37,51 +38,16 @@ static const struct spi_config spi_cfg = {
 };
 
 void platform_bmlite_reset(void);
-// void spi_test_send(uint8_t reg, uint8_t size)
-// {
-// 	int err;
-// 	uint8_t tx_buffer[1];
-	
-// 	tx_buffer[0] =reg;
-// 	static uint8_t rx_buffer[2];
-	
-// 	for (int i=0; i<sizeof(tx_buffer);i++)
-// 	{
-// 		rx_buffer[i] = 0x00;
-// 	}
-
-// 	const struct spi_buf tx_buf = {
-// 		.buf = tx_buffer,
-// 		.len = sizeof(tx_buffer)
-// 	};
-// 	const struct spi_buf_set tx = {
-// 		.buffers = &tx_buf,
-// 		.count = 1
-// 	};
-
-// 	struct spi_buf rx_buf = {
-// 		.buf = rx_buffer,
-// 		.len = size,
-// 	};
-// 	const struct spi_buf_set rx = {
-// 		.buffers = &rx_buf,
-// 		.count = 1
-// 	};
-	
-//         // gpio_pin_set_dt(&cs_pin_for_spi,0);
-
-// 	// err = spi_transceive(SPI_DEV_NAME, &spi_cfg, &tx, &rx);
-
-//         // gpio_pin_set_dt(&cs_pin_for_spi,1);
 
 
-
-
-void spi_test_send(void)
+void spi_test_send(uint8_t reg)
 {
 	int err;
-	static uint8_t tx_buffer[1];
-	static uint8_t rx_buffer[1];
+	uint8_t tx_buffer[1];
+	uint8_t rx_buffer[1];
+
+	tx_buffer[0] =reg;
+
 
 	const struct spi_buf tx_buf = {
 		.buf = tx_buffer,
@@ -100,21 +66,23 @@ void spi_test_send(void)
 		.buffers = &rx_buf,
 		.count = 1
 	};
-
+	
     gpio_pin_set(dev, CS_N, 0);
 	err = spi_transceive(spi0_dev, &spi_cfg, &tx, &rx);
     gpio_pin_set(dev, CS_N, 1);
 
 	if (err) {
+
 		printk("SPI error: %d\n", err);
+
 	} else {
-		/* Connect MISO to MOSI for loopback */
+
 		printk("TX sent: %x\n", tx_buffer[0]);
 		printk("RX recv: %x\n", rx_buffer[0]);
-		tx_buffer[0]++;
+	
 	}	
-}
 
+}
 
 void main(void)
 {
@@ -142,23 +110,14 @@ int ret;
 
 	while(1){
 
-		printk("ASA");	
-		platform_bmlite_reset();
+		printk("Salam\n");	
+		spi_test_send(10);
 		k_sleep(K_MSEC(1000));
 		gpio_pin_toggle_dt(&led);
 
 
 	}
 
-
-	while (0) {
-		spi_test_send();
-		k_sleep(K_MSEC(1000));
-		gpio_pin_toggle_dt(&led);
-
-
-
-	}
 }
 
 
