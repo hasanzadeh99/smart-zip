@@ -39,19 +39,12 @@ static const struct spi_config spi_cfg = {
 
 void platform_bmlite_reset(void);
 
-
-void spi_test_send(uint8_t reg)
-{
-	int err;
-	uint8_t tx_buffer[1];
-	uint8_t rx_buffer[1];
-
-	tx_buffer[0] =reg;
-
+void spi_read_write(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
+int err;
 
 	const struct spi_buf tx_buf = {
 		.buf = tx_buffer,
-		.len = sizeof(tx_buffer)
+		.len = length,
 	};
 	const struct spi_buf_set tx = {
 		.buffers = &tx_buf,
@@ -60,7 +53,7 @@ void spi_test_send(uint8_t reg)
 
 	struct spi_buf rx_buf = {
 		.buf = rx_buffer,
-		.len = sizeof(rx_buffer),
+		.len = length,
 	};
 	const struct spi_buf_set rx = {
 		.buffers = &rx_buf,
@@ -77,12 +70,21 @@ void spi_test_send(uint8_t reg)
 
 	} else {
 
-		printk("TX sent: %x\n", tx_buffer[0]);
-		printk("RX recv: %x\n", rx_buffer[0]);
+		for(int i=0;i<length;i++){
+
+			printk("TX %d sent: %d\n", i, tx_buffer[i]);
+			printk("RX %d recv: %d\n", i, rx_buffer[i]);
+
+		}
+
 	
 	}	
 
 }
+
+
+uint8_t tx_buffer[20];
+uint8_t rx_buffer[20];
 
 void main(void)
 {
@@ -98,7 +100,7 @@ int ret;
 
 
 	printk("SPIM Example\n");
-	printk("%d",ret);
+	printk("Error is : %d",ret);
 
 	if(!device_is_ready(spi0_dev)){
 
@@ -107,11 +109,16 @@ int ret;
 
 	}
 
+	for(int i=0; i<20; i++){
+		tx_buffer[i] = i;
+		rx_buffer[i] = 2*i;
+	}
+
 
 	while(1){
 
 		printk("Salam\n");	
-		spi_test_send(10);
+	//	spi_read_write(tx_buffer,rx_buffer,1);
 		k_sleep(K_MSEC(1000));
 		gpio_pin_toggle_dt(&led);
 
