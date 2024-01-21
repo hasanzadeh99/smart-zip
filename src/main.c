@@ -4,6 +4,30 @@
 #include <zephyr/sys/printk.h>
 // #include "bm_lite.h"
 
+
+#include ".\BMLite_sdk\bmlite_if.h"
+#include ".\BMLite_sdk\hcp_tiny.h"
+#include ".\BMLite_sdk\platform.h"
+#include ".\BMLite_sdk\bmlite_hal.h"
+#include ".\BMLite_sdk\hal_spi.h"
+
+
+#define DATA_BUFFER_SIZE (1024*5)
+static uint8_t hcp_txrx_buffer[MTU];
+static uint8_t hcp_data_buffer[DATA_BUFFER_SIZE];
+
+static HCP_comm_t hcp_chain = {
+
+    .read = platform_bmlite_spi_receive,
+    .write = platform_bmlite_spi_send,
+    .pkt_buffer = hcp_data_buffer,
+    .txrx_buffer = hcp_txrx_buffer,
+    .pkt_size = 0,
+    .pkt_size_max = sizeof(hcp_data_buffer),
+    .phy_rx_timeout = 2000,
+
+};
+
 //#define CS_N 17       //for Use PCB
 //#define RST_PIN 20    //for Use PCB
 //#define IRQ_PIN 22    //for Use PCB
@@ -37,7 +61,6 @@ static const struct spi_config spi_cfg = {
 	.slave = 0,
 };
 
-void platform_bmlite_reset(void);
 
 void spi_read_write(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
 int err;
@@ -115,10 +138,22 @@ int ret;
 	}
 
 
+	char version[100];
+	uint16_t template_id;
+	uint32_t current_id = 0;
+	bool match;
+
+	// These two lines for debug purpose only 
+	memset(version, 0, 100);
+	fpc_bep_result_t res = bep_version(&hcp_chain, version, 99);
+
+
+
+
 	while(1){
 
 		printk("Salam\n");	
-	//	spi_read_write(tx_buffer,rx_buffer,1);
+		// spi_read_write(tx_buffer,rx_buffer,1);
 		k_sleep(K_MSEC(1000));
 		gpio_pin_toggle_dt(&led);
 
@@ -131,15 +166,7 @@ int ret;
 
 
 
-void platform_bmlite_reset(void)     //reset the chip for 100ms
-{
 
-    gpio_pin_set(dev, RST_PIN, 0);
-    k_sleep(K_MSEC(100));
-    gpio_pin_set(dev, RST_PIN, 1);
-    k_sleep(K_MSEC(100));
-
-}
 
 
 

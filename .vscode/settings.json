@@ -2,7 +2,15 @@
     "files.associations": {
         "spi.h": "c",
         "printk.h": "c",
-        "bm_lite.h": "c"
+        "fingerprint.h": "c",
+        "compare": "c",
+        "platform.h": "c",
+        "hcp_tiny.h": "c",
+        "bmlite_if.h": "c",
+        "bmlite_hal.h": "c",
+        "fpc_bep_types.h": "c",
+        "fpc_crc.h": "c",
+        "hal_spi.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
