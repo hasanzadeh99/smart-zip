@@ -38,10 +38,6 @@ static uint8_t       *m_rx_buf;
 static void spi_write_read(uint8_t *write, uint8_t *read, size_t size, bool leave_cs_asserted)
 {
 
-
-	
-
-
 	spi_xfer_done = false;
 	m_tx_buf =  write;
 	m_rx_buf = read;
@@ -49,7 +45,9 @@ static void spi_write_read(uint8_t *write, uint8_t *read, size_t size, bool leav
     // gpio_pin_set(dev, CS_N, 0);   // clear CS pin
 
 
-	spi_read_write(&write, &read, size);
+	// nrf_drv_spi_transfer(nrf_drv_spi_t const * const p_instance,uint8_t const * p_tx_buffer,uint8_t tx_buffer_length,uint8_t * p_rx_buffer,uint8_t rx_buffer_length)
+	// nrf_drv_spi_transfer(&spi, m_tx_buf, size, m_rx_buf, size);
+	spi_transfer(write, read, size);
 
 
 	// while (!spi_xfer_done)
@@ -66,6 +64,10 @@ fpc_bep_result_t hal_bmlite_spi_write_read(uint8_t *write, uint8_t *read, size_t
 
 	uint8_t num_of_rounds = size/255, i;
 	uint8_t *p_write = write, *p_read = read;
+
+
+	printk("number of rounds %d\n", num_of_rounds);
+
 
 	for(i=0; i<num_of_rounds; i++){
 		spi_write_read(p_write, p_read, 255, true);
