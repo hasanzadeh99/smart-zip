@@ -17,5 +17,5 @@ target_sources(app PRIVATE
 
 
 
-
+add_definitions(-DDEBUG_COMM)
 

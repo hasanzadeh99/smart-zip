@@ -107,6 +107,10 @@ fpc_bep_result_t platform_bmlite_spi_send(uint16_t size, const uint8_t *data, ui
 {
     uint8_t buff[size];
 #ifdef DEBUG_COMM
+    LOG_DEBUG("##### size is %d", size);
+    LOG_DEBUG("\n");
+
+    
     LOG_DEBUG("-> ");
     for (int i=0; i<size; i++)
        LOG_DEBUG("%02X ", data[i]);
