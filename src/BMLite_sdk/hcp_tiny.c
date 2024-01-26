@@ -266,7 +266,7 @@ fpc_bep_result_t bmlite_send(HCP_comm_t *hcp_comm)
         p += phy_frm->t_size;
         data_left -= phy_frm->t_size;
 
-        bep_result = _tx_link(hcp_comm);
+       bep_result = _tx_link(hcp_comm);
     }
 
     if(bep_result) {
@@ -285,11 +285,11 @@ static fpc_bep_result_t _tx_link(HCP_comm_t *hcp_comm)
     *(uint32_t *)(hcp_comm->txrx_buffer + pkt->lnk_size + 4) = crc_calc;
     uint16_t size = pkt->lnk_size + 8;
 
-    bep_result = hcp_comm->write(size, hcp_comm->txrx_buffer, 0);
+   bep_result = hcp_comm->write(size, hcp_comm->txrx_buffer, 0);
 
     // Wait for ACK
     uint32_t ack;
-    bep_result = hcp_comm->read(4, (uint8_t *)&ack, 500);
+   bep_result = hcp_comm->read(4, (uint8_t *)&ack, 500);
     if (bep_result == FPC_BEP_RESULT_TIMEOUT) {
         LOG_DEBUG("ASK read timeout\n");
         bmlite_on_error(BMLITE_ERROR_SEND_CMD, FPC_BEP_RESULT_TIMEOUT);
