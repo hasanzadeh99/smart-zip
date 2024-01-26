@@ -33,6 +33,7 @@ static HCP_comm_t hcp_chain = {
 //#define IRQ_PIN 22    //for Use PCB
 
 
+#define RX_PIN_BMLITE 06       //for Use DK board
 #define CS_N 04       //for Use DK board
 #define RST_PIN 03    //for Use DK board
 #define IRQ_PIN 28	  //for Use DK board
@@ -62,7 +63,7 @@ static const struct spi_config spi_cfg = {
 };
 
 
-void spi_read_write(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
+void spi_transfer(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
 int err;
 
 	const struct spi_buf tx_buf = {
@@ -95,8 +96,8 @@ int err;
 
 		for(int i=0;i<length;i++){
 
-			printk("TX %d sent: %d\n", i, tx_buffer[i]);
-			printk("RX %d recv: %d\n", i, rx_buffer[i]);
+			printk("TX %d sent: %02X \n", i, tx_buffer[i]);
+			printk("RX %d recv: %02X \n", i, rx_buffer[i]);
 
 		}
 
@@ -122,8 +123,10 @@ int ret;
 	ret = gpio_pin_configure(dev, CS_N , GPIO_OUTPUT_ACTIVE);       //CS_N _ PIN
 
 
+	ret = gpio_pin_configure(dev, RX_PIN_BMLITE , GPIO_OUTPUT_ACTIVE);       //RX _ PIN
+
 	printk("SPIM Example\n");
-	printk("Error is : %d",ret);
+
 
 	if(!device_is_ready(spi0_dev)){
 
@@ -145,12 +148,18 @@ int ret;
 
 	// These two lines for debug purpose only 
 	memset(version, 0, 100);
-	fpc_bep_result_t res = bep_version(&hcp_chain, version, 99);
+	fpc_bep_result_t res = bep_version(&hcp_chain, version, 9);
 
+	gpio_pin_set(dev, RX_PIN_BMLITE, 1);
 
-
+	gpio_pin_set(dev, RST_PIN, 0);
+	k_sleep(K_MSEC(100));
+	gpio_pin_set(dev, RST_PIN, 1);
+	k_sleep(K_MSEC(100));
 
 	while(1){
+
+		res = bep_enroll_finger(&hcp_chain);
 
 		printk("Salam\n");	
 		// spi_read_write(tx_buffer,rx_buffer,1);
