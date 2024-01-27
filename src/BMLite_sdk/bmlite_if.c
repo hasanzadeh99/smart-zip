@@ -24,6 +24,7 @@
 #define MAX_CAPTURE_ATTEMPTS 15
 #define MAX_SINGLE_CAPTURE_ATTEMPTS 3
 #define CAPTURE_TIMEOUT 3000
+#define LOG_DEBUG(...)
 
 #define exit_if_err(c) { bep_result = c; if(bep_result || chain->bep_result) goto exit; }
 
@@ -76,7 +77,7 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
 
         bmlite_get_arg(chain, ARG_COUNT);
         samples_remaining = *(uint32_t *)chain->arg.data;
-//      DEBUG("Enroll samples remaining: %d\n", samples_remaining);
+        LOG_DEBUG("Enroll samples remaining: %d\n", samples_remaining);
 
         /* Break enrolling if we can't collect enough correct images for enroll*/
         if (samples_remaining == 0U) {

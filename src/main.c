@@ -52,13 +52,12 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
 
 
 static const struct spi_config spi_cfg = {
-	// .operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_TRANSFER_MSB |
-	// 	     SPI_MODE_CPOL | SPI_MODE_CPHA,	
+	.operation = SPI_OP_MODE_MASTER | SPI_WORD_SET(8) | SPI_TRANSFER_MSB ,	
 			 
 	.operation = SPI_WORD_SET(8),
 		
 
-	.frequency = 125000,
+	.frequency = 4000000,
 	.slave = 0,
 };
 
@@ -146,6 +145,11 @@ int ret;
 	uint32_t current_id = 0;
 	bool match;
 
+
+	k_sleep(K_MSEC(1000));
+
+
+
 	// These two lines for debug purpose only 
 	memset(version, 0, 100);
 	fpc_bep_result_t res = bep_version(&hcp_chain, version, 9);
@@ -157,13 +161,16 @@ int ret;
 	gpio_pin_set(dev, RST_PIN, 1);
 	k_sleep(K_MSEC(100));
 
+	k_sleep(K_MSEC(1000));
+
 	while(1){
 
 		res = bep_enroll_finger(&hcp_chain);
-
+		k_sleep(K_MSEC(2000));
+		res = bep_template_save(&hcp_chain, current_id++);
 		printk("Salam\n");	
 		// spi_read_write(tx_buffer,rx_buffer,1);
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(3000));
 		gpio_pin_toggle_dt(&led);
 
 
