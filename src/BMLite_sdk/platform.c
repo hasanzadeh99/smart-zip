@@ -44,13 +44,13 @@ fpc_bep_result_t platform_init(void *params)
     return result;
 }
 
-void platform_bmlite_reset(void)
-{
-    // gpio_pin_set(dev, RST_PIN, 0);
-    // k_sleep(K_MSEC(100));
-    // gpio_pin_set(dev, RST_PIN, 1);
-    // k_sleep(K_MSEC(100));
-}
+// void platform_bmlite_reset(void)
+// {
+//     // gpio_pin_set(dev, RST_PIN, 0);
+//     // k_sleep(K_MSEC(100));
+//     // gpio_pin_set(dev, RST_PIN, 1);
+//     // k_sleep(K_MSEC(100));
+// }
 
 
 #ifdef BMLITE_ON_UART
@@ -107,11 +107,11 @@ fpc_bep_result_t platform_bmlite_spi_send(uint16_t size, const uint8_t *data, ui
 {
     uint8_t buff[size];
 #ifdef DEBUG_COMM
-    LOG_DEBUG("##### size is %d", size);
+    LOG_DEBUG("platform110##### size is %d", size);
     LOG_DEBUG("\n");
 
     
-    LOG_DEBUG("-> ");
+    LOG_DEBUG("platform114-> ");
     for (int i=0; i<size; i++)
        LOG_DEBUG("%02X ", data[i]);
     LOG_DEBUG("\n");
@@ -125,11 +125,8 @@ fpc_bep_result_t platform_bmlite_spi_receive(uint16_t size, uint8_t *data, uint3
 	volatile uint32_t start_time = hal_timebase_get_tick();
 	volatile uint32_t curr_time = start_time;
     // Wait for BM_Lite Ready for timeout or indefinitely if timeout is 0
-    while (!hal_bmlite_get_status() &&
-    		(!timeout || (curr_time = hal_timebase_get_tick()) - start_time < timeout)) {
-                if(hal_check_button_pressed()) {
-                    return FPC_BEP_RESULT_TIMEOUT;
-                }
+    while (!hal_bmlite_get_status() && (!timeout || (curr_time = hal_timebase_get_tick()) - start_time < timeout)) {
+
     }
     if(timeout && curr_time - start_time >= timeout) {
         return FPC_BEP_RESULT_TIMEOUT;
@@ -139,7 +136,7 @@ fpc_bep_result_t platform_bmlite_spi_receive(uint16_t size, uint8_t *data, uint3
     fpc_bep_result_t res = hal_bmlite_spi_write_read(buff, data, size, false);
 
 #ifdef DEBUG_COMM
-    LOG_DEBUG("<- ");
+    LOG_DEBUG("platform142<- ");
     for (int i=0; i<size; i++)
        LOG_DEBUG("%02X ", data[i]);
     LOG_DEBUG("\n");

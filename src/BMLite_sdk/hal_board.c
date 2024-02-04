@@ -31,9 +31,6 @@
 
 static volatile bool sensor_interrupt = false;
 
-static void nordic_bmlite_gpio_init(void);
-void nordic_bmlite_spi_init(uint32_t speed_hz);
-
 
 fpc_bep_result_t hal_board_init(void *params)
 {
@@ -51,14 +48,4 @@ void hal_bmlite_reset(bool state)
     // }
 }
 
-bool hal_bmlite_get_status(void)
-{
-    // return nrf_drv_gpiote_in_is_set(BMLITE_PIN_STATUS);
-}
-
-static void nordic_bmlite_gpio_init(void)
-{
-
-    return;
-}
 

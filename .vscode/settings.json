@@ -10,7 +10,10 @@
         "bmlite_hal.h": "c",
         "fpc_bep_types.h": "c",
         "fpc_crc.h": "c",
-        "hal_spi.h": "c"
+        "hal_spi.h": "c",
+        "bmlite_if_callbacks.h": "c",
+        "zipperble.h": "c",
+        "stdint.h": "c"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }

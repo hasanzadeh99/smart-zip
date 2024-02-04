@@ -57,12 +57,12 @@ static const struct spi_config spi_cfg = {
 	.operation = SPI_WORD_SET(8),
 		
 
-	.frequency = 4000000,
+	.frequency = 1000000,
 	.slave = 0,
 };
 
 
-void spi_transfer(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
+int spi_transfer(uint8_t *tx_buffer, uint8_t *rx_buffer, size_t length){
 int err;
 
 	const struct spi_buf tx_buf = {
@@ -89,22 +89,53 @@ int err;
 
 	if (err) {
 
-		printk("SPI error: %d\n", err);
+		printk("main92SPI error: %d\n", err);
 
 	} else {
 
-		for(int i=0;i<length;i++){
+		// for(int i=0;i<length;i++){
 
-			printk("TX %d sent: %02X \n", i, tx_buffer[i]);
-			printk("RX %d recv: %02X \n", i, rx_buffer[i]);
+		// 	printk("TX %d sent: %02X \n", i, tx_buffer[i]);
+		// 	printk("RX %d recv: %02X \n", i, rx_buffer[i]);
 
-		}
+		// }
 
 	
 	}	
 
+
+	return err;
 }
 
+static volatile uint32_t systick;
+volatile uint32_t button_pressed_time = 0;
+
+static uint32_t btn_press_start;
+static uint32_t btn_pressed = 0;
+
+uint32_t hal_timebase_get_tick(void)
+{
+
+
+    return (uint32_t)k_uptime_get();  // Convert uptime in ms to ticks
+
+}
+
+bool hal_bmlite_get_status(void)
+{
+	int value = gpio_pin_get(dev, IRQ_PIN);
+	return value;
+    
+}
+
+void platform_bmlite_reset(void){
+
+	gpio_pin_set(dev, RST_PIN, 0);
+	k_sleep(K_MSEC(100));
+	gpio_pin_set(dev, RST_PIN, 1);
+	k_sleep(K_MSEC(100));
+
+}
 
 uint8_t tx_buffer[20];
 uint8_t rx_buffer[20];
@@ -124,7 +155,9 @@ int ret;
 
 	ret = gpio_pin_configure(dev, RX_PIN_BMLITE , GPIO_OUTPUT_ACTIVE);       //RX _ PIN
 
-	printk("SPIM Example\n");
+	ret = gpio_pin_configure(dev, IRQ_PIN, GPIO_INPUT);						// IRQ PIN for BMLite
+
+	
 
 
 	if(!device_is_ready(spi0_dev)){
@@ -145,33 +178,93 @@ int ret;
 	uint32_t current_id = 0;
 	bool match;
 
+	
+	
 
 	k_sleep(K_MSEC(1000));
 
+	// gpio_pin_set(dev, RX_PIN_BMLITE, 1);
 
+	platform_bmlite_reset();
 
-	// These two lines for debug purpose only 
+	k_sleep(K_MSEC(1000));
+
+	printk("Start Program\n");
+
 	memset(version, 0, 100);
-	fpc_bep_result_t res = bep_version(&hcp_chain, version, 9);
+	fpc_bep_result_t res = bep_version(&hcp_chain, version, 99);
 
-	gpio_pin_set(dev, RX_PIN_BMLITE, 1);
+	if (res == FPC_BEP_RESULT_OK){
 
-	gpio_pin_set(dev, RST_PIN, 0);
-	k_sleep(K_MSEC(100));
-	gpio_pin_set(dev, RST_PIN, 1);
-	k_sleep(K_MSEC(100));
+		printk("-> FPC - Version Read OK!");
+		printk("-> FPC - Version: %s", version); 
 
-	k_sleep(K_MSEC(1000));
+	}else{
+
+		printk("ERROR in Reading Version ******  res is: %d\n",res);
+	
+	}
+
+
+	printk("ُI am in while... reading version...\n");
+	platform_bmlite_reset();
+	k_sleep(K_MSEC(2000));
+	res = bep_version(&hcp_chain, version, 99);
+	if (res == FPC_BEP_RESULT_OK){
+		printk("-> FPC - Version Read OK!");
+		printk("-> FPC - Version: %s", version); 
+	}else{
+		printk("Versionnnnnnnn******  res is: %d\n",res);
+	}
+
+	
+	gpio_pin_toggle_dt(&led);
+
 
 	while(1){
 
+		printk("ُHello ...\n");
+		k_sleep(K_MSEC(20));
 		res = bep_enroll_finger(&hcp_chain);
-		k_sleep(K_MSEC(2000));
-		res = bep_template_save(&hcp_chain, current_id++);
-		printk("Salam\n");	
-		// spi_read_write(tx_buffer,rx_buffer,1);
-		k_sleep(K_MSEC(3000));
-		gpio_pin_toggle_dt(&led);
+		printk("***************after enroll finger********\n");
+		printk("bep_enroll_finger res is: %d\n",res);
+		if(res== FPC_BEP_RESULT_OK) {
+
+			res = bep_template_save(&hcp_chain, current_id++);
+			if(res== FPC_BEP_RESULT_OK) printk("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH\n\n\n");
+
+		}
+
+
+
+		res = sensor_wait_finger_not_present(&hcp_chain, 0);
+		printk("***************after wait_finger_not_present********\n");
+		printk("sensor_wait_finger_not_present res is: %d\n",res);
+
+
+		// k_sleep(K_MSEC(2000));
+		res = bep_identify_finger(&hcp_chain, 0, &template_id, &match);
+		if(res== FPC_BEP_RESULT_OK) {
+
+			printk("FFFFFFFFFFFFFFFFFFFFFFFFFF\n\n\n\n\n");
+			gpio_pin_toggle_dt(&led);
+		}
+		// printk("***************after identify finger********\n");
+		// printk("bep_identify_finger res is:  %d\n",res);
+		// k_sleep(K_MSEC(2000));
+		// if (res == FPC_BEP_RESULT_TIMEOUT || res == FPC_BEP_RESULT_IO_ERROR) {
+		// 	platform_bmlite_reset();
+		// 	printk("***************after bmlite reset********\n");
+		// 	printk("bep_platform_bmlite_reset res is:  %d\n",res);
+		// 	continue;
+		// } else if (res != FPC_BEP_RESULT_OK) {
+		// 	continue;
+		// }
+
+
+
+		// k_sleep(K_MSEC(2000));
+		// gpio_pin_toggle_dt(&led);
 
 
 	}

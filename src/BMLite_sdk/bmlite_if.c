@@ -18,6 +18,9 @@
 #include "bmlite_if.h"
 #include "bmlite_hal.h"
 #include <stdio.h>
+#include <zephyr/kernel.h>
+
+
 
 #include "bmlite_if_callbacks.h"
 
@@ -55,16 +58,16 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
     fpc_bep_result_t bep_result = FPC_BEP_RESULT_OK;
     bool enroll_done = false;
 
-    bmlite_on_start_enroll();
+    // bmlite_on_start_enroll();
     /* Enroll start */
     exit_if_err(bmlite_send_cmd(chain, CMD_ENROLL, ARG_START));
     
     for (uint8_t i = 0; i < MAX_CAPTURE_ATTEMPTS; ++i) {
 
-        bmlite_on_start_enrollcapture();
+        // bmlite_on_start_enrollcapture();
         bep_result = bep_capture(chain, CAPTURE_TIMEOUT);
-        bmlite_on_finish_enrollcapture();
-
+        // bmlite_on_finish_enrollcapture();
+        printk("after bep capture the bep_result is %d  ",bep_result);
         if (bep_result != FPC_BEP_RESULT_OK) {
             continue;
         }
@@ -77,7 +80,7 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
 
         bmlite_get_arg(chain, ARG_COUNT);
         samples_remaining = *(uint32_t *)chain->arg.data;
-        LOG_DEBUG("Enroll samples remaining: %d\n", samples_remaining);
+        printk("Enroll samples remaining: %d\n", samples_remaining);
 
         /* Break enrolling if we can't collect enough correct images for enroll*/
         if (samples_remaining == 0U) {
@@ -91,7 +94,8 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
     bep_result = bmlite_send_cmd(chain, CMD_ENROLL, ARG_FINISH);
 
 exit:
-    bmlite_on_finish_enroll();
+    // bmlite_on_finish_enroll();
+    printk("bmlite95 - exit\n");
     return (!enroll_done) ? FPC_BEP_RESULT_GENERAL_ERROR : bep_result;
 }
 
@@ -100,7 +104,7 @@ fpc_bep_result_t bep_identify_finger(HCP_comm_t *chain, uint32_t timeout, uint16
     fpc_bep_result_t bep_result;
     *match = false;
 
-    bmlite_on_identify_start();
+    // bmlite_on_identify_start();
 
     exit_if_err(bep_capture(chain, timeout));
     exit_if_err(bep_image_extract(chain));
@@ -111,10 +115,10 @@ fpc_bep_result_t bep_identify_finger(HCP_comm_t *chain, uint32_t timeout, uint16
         bmlite_get_arg(chain, ARG_ID);
         *template_id = *(uint16_t *)chain->arg.data;
         // Delay for possible updating template on BM-Lite
-        hal_timebase_busy_wait(50);
+        k_sleep(K_MSEC(50));
     }
 exit:
-    bmlite_on_identify_finish();
+    // bmlite_on_identify_finish();
     return bep_result;    
 }
 
@@ -149,7 +153,7 @@ fpc_bep_result_t bep_capture(HCP_comm_t *chain, uint16_t timeout)
     fpc_bep_result_t bep_result;
     uint32_t prev_timeout = chain->phy_rx_timeout;
 
-    bmlite_on_start_capture();
+    // bmlite_on_start_capture();
     chain->phy_rx_timeout = timeout;
     for(int i=0; i< MAX_SINGLE_CAPTURE_ATTEMPTS; i++) {
         bep_result = bmlite_send_cmd_arg(chain, CMD_CAPTURE, ARG_NONE, ARG_TIMEOUT, &timeout, sizeof(timeout));
@@ -161,7 +165,7 @@ fpc_bep_result_t bep_capture(HCP_comm_t *chain, uint16_t timeout)
             break;
     }
     chain->phy_rx_timeout = prev_timeout;
-    bmlite_on_finish_capture();
+    // bmlite_on_finish_capture();
 
     return bep_result;
 }

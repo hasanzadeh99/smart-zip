@@ -65,10 +65,6 @@ fpc_bep_result_t hal_bmlite_spi_write_read(uint8_t *write, uint8_t *read, size_t
 	uint8_t num_of_rounds = size/255, i;
 	uint8_t *p_write = write, *p_read = read;
 
-
-	printk("number of rounds %d\n", num_of_rounds);
-
-
 	for(i=0; i<num_of_rounds; i++){
 		spi_write_read(p_write, p_read, 255, true);
 		p_write += 255;

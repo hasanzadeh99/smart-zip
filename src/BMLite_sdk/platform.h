@@ -43,7 +43,7 @@ fpc_bep_result_t platform_init(void *params);
  * @brief Does BM-Lite HW Reset
  *
  */
-void platform_bmlite_reset(void);
+// void platform_bmlite_reset(void);
 
 /**
  * @brief Sends data over SPI port in blocking mode.
