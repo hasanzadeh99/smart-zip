@@ -64,6 +64,7 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
     
     for (uint8_t i = 0; i < MAX_CAPTURE_ATTEMPTS; ++i) {
 
+        printk("we are in for and capturing");
         // bmlite_on_start_enrollcapture();
         bep_result = bep_capture(chain, CAPTURE_TIMEOUT);
         // bmlite_on_finish_enrollcapture();
@@ -88,6 +89,7 @@ fpc_bep_result_t bep_enroll_finger(HCP_comm_t *chain)
             break;
         }
 
+        printk("before sensor wait fg not present");
         sensor_wait_finger_not_present(chain, 0);
     }
 

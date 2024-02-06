@@ -206,65 +206,72 @@ int ret;
 	}
 
 
-	printk("ُI am in while... reading version...\n");
-	platform_bmlite_reset();
-	k_sleep(K_MSEC(2000));
-	res = bep_version(&hcp_chain, version, 99);
-	if (res == FPC_BEP_RESULT_OK){
-		printk("-> FPC - Version Read OK!");
-		printk("-> FPC - Version: %s", version); 
-	}else{
-		printk("Versionnnnnnnn******  res is: %d\n",res);
-	}
+// if(1){
 
-	
-	gpio_pin_toggle_dt(&led);
+// 	printk("I am in while... reading version...\n");
+// 	platform_bmlite_reset();
+// 	k_sleep(K_MSEC(2000));
+// 	res = bep_version(&hcp_chain, version, 99);
+// 	if (res == FPC_BEP_RESULT_OK){
+// 		printk("-> FPC - Version Read OK!");
+// 		printk("-> FPC - Version: %s", version); 
+// 	}else{
+// 		printk("Versionnnnnnnn******  res is: %d\n",res);
+// 	}
+
+// 	gpio_pin_toggle_dt(&led);
+// 	k_sleep(K_MSEC(500));
+
+
+// }
+
 
 
 	while(1){
 
-		printk("ُHello ...\n");
-		k_sleep(K_MSEC(20));
-		res = bep_enroll_finger(&hcp_chain);
-		printk("***************after enroll finger********\n");
-		printk("bep_enroll_finger res is: %d\n",res);
-		if(res== FPC_BEP_RESULT_OK) {
 
-			res = bep_template_save(&hcp_chain, current_id++);
-			if(res== FPC_BEP_RESULT_OK) printk("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH\n\n\n");
+		printk("\nHello ...\n\n\n\n\n");
+		// res = bep_enroll_finger(&hcp_chain);
+		// printk("***************after enroll finger********\n");
+		// printk("bep_enroll_finger res is: %d\n",res);
+		// if(res== FPC_BEP_RESULT_OK) {
 
-		}
+		// 	res = bep_template_save(&hcp_chain, current_id++);
+		// 	if(res== FPC_BEP_RESULT_OK) printk("The FP has been attached to %d \n\n\n",current_id);
 
 
+		// }
+
+		k_sleep(K_MSEC(2000));
+		gpio_pin_toggle_dt(&led);
 
 		res = sensor_wait_finger_not_present(&hcp_chain, 0);
 		printk("***************after wait_finger_not_present********\n");
 		printk("sensor_wait_finger_not_present res is: %d\n",res);
 
 
-		// k_sleep(K_MSEC(2000));
+
 		res = bep_identify_finger(&hcp_chain, 0, &template_id, &match);
 		if(res== FPC_BEP_RESULT_OK) {
 
-			printk("FFFFFFFFFFFFFFFFFFFFFFFFFF\n\n\n\n\n");
+			printk("FFFFFFFFFFFFFFFFFFFFFFFFFF the id is %i \n\n\n\n\n", template_id);
 			gpio_pin_toggle_dt(&led);
 		}
-		// printk("***************after identify finger********\n");
-		// printk("bep_identify_finger res is:  %d\n",res);
-		// k_sleep(K_MSEC(2000));
-		// if (res == FPC_BEP_RESULT_TIMEOUT || res == FPC_BEP_RESULT_IO_ERROR) {
-		// 	platform_bmlite_reset();
-		// 	printk("***************after bmlite reset********\n");
-		// 	printk("bep_platform_bmlite_reset res is:  %d\n",res);
-		// 	continue;
-		// } else if (res != FPC_BEP_RESULT_OK) {
-		// 	continue;
-		// }
+		printk("***************after identify finger********\n");
+		printk("bep_identify_finger res is:  %d\n",res);
+		k_sleep(K_MSEC(2000));
+		if (res == FPC_BEP_RESULT_TIMEOUT || res == FPC_BEP_RESULT_IO_ERROR) {
+			platform_bmlite_reset();
+			printk("***************after bmlite reset********\n");
+			printk("bep_platform_bmlite_reset res is:  %d\n",res);
+			continue;
+		} else if (res != FPC_BEP_RESULT_OK) {
+			continue;
+		}
 
 
 
-		// k_sleep(K_MSEC(2000));
-		// gpio_pin_toggle_dt(&led);
+
 
 
 	}

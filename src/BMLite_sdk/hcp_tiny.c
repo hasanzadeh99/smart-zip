@@ -302,14 +302,14 @@ static fpc_bep_result_t _tx_link(HCP_comm_t *hcp_comm)
     *(uint32_t *)(hcp_comm->txrx_buffer + pkt->lnk_size + 4) = crc_calc;
     uint16_t size = pkt->lnk_size + 8;
 
-    printk("before writing ... \n");
-    printk("hcp_tiny303txrx_buffer %s ", hcp_comm->txrx_buffer);
+    // printk("before writing ... \n");
+    // printk("hcp_tiny303txrx_buffer %s ", hcp_comm->txrx_buffer);
    bep_result = hcp_comm->write(size, hcp_comm->txrx_buffer, 0);
 
     // Wait for ACK
     uint32_t ack;
 
-    printk("hcp_tiny309before reading ... \n");
+    // printk("hcp_tiny309before reading ... \n");
    bep_result = hcp_comm->read(4, (uint8_t *)&ack, 500);
     if (bep_result == FPC_BEP_RESULT_TIMEOUT) {
         printk("hcp_tiny312ASK read timeout\n");
@@ -322,7 +322,7 @@ static fpc_bep_result_t _tx_link(HCP_comm_t *hcp_comm)
         return FPC_BEP_RESULT_IO_ERROR;
     }
 
-    printk("hcp_tiny322FPC_BEP_RESULT_OK tx_link_ \n");
+    // printk("hcp_tiny322FPC_BEP_RESULT_OK tx_link_ \n");
     return FPC_BEP_RESULT_OK;
 }
 

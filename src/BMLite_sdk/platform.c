@@ -107,8 +107,8 @@ fpc_bep_result_t platform_bmlite_spi_send(uint16_t size, const uint8_t *data, ui
 {
     uint8_t buff[size];
 #ifdef DEBUG_COMM
-    LOG_DEBUG("platform110##### size is %d", size);
-    LOG_DEBUG("\n");
+    // LOG_DEBUG("platform110##### size is %d", size);
+    // LOG_DEBUG("\n");
 
     
     LOG_DEBUG("platform114-> ");
