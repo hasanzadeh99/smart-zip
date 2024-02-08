@@ -2,7 +2,6 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/printk.h>
-// #include "bm_lite.h"
 
 
 #include ".\BMLite_sdk\bmlite_if.h"
@@ -28,21 +27,25 @@ static HCP_comm_t hcp_chain = {
 
 };
 
-//#define CS_N 17       //for Use PCB
-//#define RST_PIN 20    //for Use PCB
-//#define IRQ_PIN 22    //for Use PCB
+#define CS_N 17       			//for Use PCB
+#define RST_PIN 20    			//for Use PCB
+#define IRQ_PIN 22    			//for Use PCB
+#define RX_PIN_BMLITE 06        //for Use PCB
+#define BLUE_LED	led0        //for Use PCB
+#define RED_LED		led1        //for Use PCB
+#define GREEN_LED	led2        //for Use PCB
 
 
-#define RX_PIN_BMLITE 06       //for Use DK board
-#define CS_N 04       //for Use DK board
-#define RST_PIN 03    //for Use DK board
-#define IRQ_PIN 28	  //for Use DK board
+// #define RX_PIN_BMLITE 06       //for Use DK board
+// #define CS_N 04       //for Use DK board
+// #define RST_PIN 03    //for Use DK board
+// #define IRQ_PIN 28	  //for Use DK board
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   1000
 
-#define SPI0_NODE DT_NODELABEL(spi1)       //for Use DK board
-// #define SPI0_NODE DT_NODELABEL(spi0)       //for Use PCB
+// #define SPI0_NODE DT_NODELABEL(spi1)       //for Use DK board
+#define SPI0_NODE DT_NODELABEL(spi0)       //for Use PCB
 static const struct device * spi0_dev = DEVICE_DT_GET(SPI0_NODE);
 
 const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
@@ -237,8 +240,6 @@ int ret;
 // }
 
 
-
-
 	// bep_template_remove_all(&hcp_chain);
 
 
@@ -279,12 +280,12 @@ int ret;
 
 				if(template_id==1){
 
-					gpio_pin_toggle_dt(&led0);
+					gpio_pin_toggle_dt(&GREEN_LED);
 
 
 				}else if(template_id==2){
 
-					gpio_pin_toggle_dt(&led1);
+					gpio_pin_toggle_dt(&BLUE_LED);
 
 				}
 
@@ -293,7 +294,7 @@ int ret;
 
 				printf("No match\n");
 				for(int i=0;i<20;i++){
-					gpio_pin_toggle_dt(&led2);
+					gpio_pin_toggle_dt(&RED_LED);
 					k_sleep(K_MSEC(100));
 
 				}
