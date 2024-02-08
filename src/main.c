@@ -47,8 +47,16 @@ static const struct device * spi0_dev = DEVICE_DT_GET(SPI0_NODE);
 
 const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(gpio0));
 
+#define LED0_NODE DT_ALIAS(led0)
+static const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+
+
 #define LED1_NODE DT_ALIAS(led1)
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
+static const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(LED1_NODE, gpios);
+
+
+#define LED2_NODE DT_ALIAS(led2)
+static const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(LED2_NODE, gpios);
 
 
 static const struct spi_config spi_cfg = {
@@ -146,7 +154,9 @@ int ret;
 
 
 
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+	ret = gpio_pin_configure_dt(&led0, GPIO_OUTPUT_INACTIVE);
+	ret = gpio_pin_configure_dt(&led1, GPIO_OUTPUT_INACTIVE);
+	ret = gpio_pin_configure_dt(&led2, GPIO_OUTPUT_INACTIVE);
 
 
 	ret = gpio_pin_configure(dev, RST_PIN , GPIO_OUTPUT_ACTIVE);    //RST _ PIN
@@ -176,6 +186,7 @@ int ret;
 	char version[100];
 	uint16_t template_id;
 	uint32_t current_id = 0;
+	uint32_t counts = 0;
 	bool match;
 
 	
@@ -227,56 +238,87 @@ int ret;
 
 
 
+
+	// bep_template_remove_all(&hcp_chain);
+
+
 	while(1){
 
 
 		printk("\nHello ...\n\n\n\n\n");
-		res = bep_enroll_finger(&hcp_chain);
-		printk("***************after enroll finger********\n");
-		printk("bep_enroll_finger res is: %d\n",res);
-		if(res== FPC_BEP_RESULT_OK) {
 
-			res = bep_template_save(&hcp_chain, current_id++);
-			if(res== FPC_BEP_RESULT_OK) printk("The FP has been attached to %d \n\n\n",current_id);
 
+		while(0){
+
+				res = bep_enroll_finger(&hcp_chain);
+				printk("***************after enroll finger********\n");
+				printk("bep_enroll_finger res is: %d\n",res);
+				if(res== FPC_BEP_RESULT_OK) {
+
+					res = bep_template_save(&hcp_chain, ++current_id);       //start from 1 
+					if(res== FPC_BEP_RESULT_OK) printk("The FP has been attached to %d \n\n\n",current_id);
+
+
+				}
+
+
+				bep_template_get_count(&hcp_chain, &counts);
+				printk("Count is : %d\n",counts);
+
+				bep_template_get_ids(&hcp_chain);
 
 		}
 
-		k_sleep(K_MSEC(2000));
-		gpio_pin_toggle_dt(&led);
 
-		// res = sensor_wait_finger_not_present(&hcp_chain, 0);
-		// printk("***************after wait_finger_not_present********\n");
-		// printk("sensor_wait_finger_not_present res is: %d\n",res);
+		printk("we are before identify");
+		res = bep_identify_finger(&hcp_chain, 0, &template_id, &match);
+		if(res== FPC_BEP_RESULT_OK) {
 
+			if (match) {
+				printf("Match with template id: %d\n\n\n\n\n\n", template_id);
 
-		// printk("we are before identify");
-		// res = bep_identify_finger(&hcp_chain, 0, &template_id, &match);
-		// if(res== FPC_BEP_RESULT_OK) {
+				if(template_id==1){
 
-		// 	if (match) {
-		// 		printf("Match with template id: %d\n\n\n\n\n\n", template_id);
-		// 	} else {
-		// 		printf("No match\n");
-		// 	}
-		// 	gpio_pin_toggle_dt(&led);
-		// }
-
-		// printk("***************after identify finger********\n");
-		// printk("bep_identify_finger res is:  %d\n",res);
-		// k_sleep(K_MSEC(2000));
-		// if (res == FPC_BEP_RESULT_TIMEOUT || res == FPC_BEP_RESULT_IO_ERROR) {
-		// 	platform_bmlite_reset();
-		// 	printk("***************after bmlite reset********\n");
-		// 	printk("bep_platform_bmlite_reset res is:  %d\n",res);
-		// 	continue;
-		// } else if (res != FPC_BEP_RESULT_OK) {
-		// 	continue;
-		// }
+					gpio_pin_toggle_dt(&led0);
 
 
+				}else if(template_id==2){
+
+					gpio_pin_toggle_dt(&led1);
+
+				}
 
 
+			} else {
+
+				printf("No match\n");
+				for(int i=0;i<20;i++){
+					gpio_pin_toggle_dt(&led2);
+					k_sleep(K_MSEC(100));
+
+				}
+
+				
+			}
+		}
+
+		printk("***************after identify finger********\n");
+		printk("bep_identify_finger res is:  %d\n",res);
+	
+		if (res == FPC_BEP_RESULT_TIMEOUT || res == FPC_BEP_RESULT_IO_ERROR) {
+			platform_bmlite_reset();
+			printk("***************after bmlite reset********\n");
+			printk("bep_platform_bmlite_reset res is:  %d\n",res);
+			continue;
+		} else if (res != FPC_BEP_RESULT_OK) {
+			continue;
+		}
+
+
+
+		res = sensor_wait_finger_not_present(&hcp_chain, 0);
+		printk("***************after wait_finger_not_present********\n");
+		printk("sensor_wait_finger_not_present res is: %d\n",res);
 
 
 	}
